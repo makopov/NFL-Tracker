@@ -56,7 +56,7 @@ while bContinue:
         
         for iLoop in range(0, iRequestsRemaining):
             #Get Tweets if we have requests available
-            aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities='true')
+            aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
             
             #check if we've hit our rate limit somehow
             if "message" in aSearchResults == True:
