@@ -22,6 +22,7 @@ def storeTweets(aTweets):
 
     oTweetFile.close()
 
+    print "Results written to " + strFile
     return bReturn
 
 oTwitterAPI = twitter.Api(consumer_key='q1xeSRo0kXP7aNpRTd89UtKl7',
@@ -42,23 +43,30 @@ while bContinue:
 
     iTweetCount = 0
     iLoopCount = 0
+    aTweets = list()
 
-    print "reset= " + str(iRequestsReset) + ", remaining = " + str(iRequestsRemaining) + ", allowed = " + str(iRequestsAllowed)
-
-    sys.exit(0)
     if iRequestsRemaining > 0:
+        print "Starting next interval of search requests.."
+        print str(iRequestsRemaining) + " search requests are available at this time"
+
         #TODO: If we can make API calls, we need to re read the terms file
         #make some function call here to read in terms
-
+        
         for iLoop in range(0, iRequestsRemaining):
             #Get Tweets if we have requests available
-            aTweets = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities='true')
+            aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities='true')
             
-            storeTweets(aTweets)
+            #check if we've hit our rate limit somehow
+            if "message" in aSearchResults == True:
+                #rate limit exceed..somehow, lets sleep
+                break;
+            else:
+                aTweets += aSearchResults
 
             iLoopCount +=1
-            iTweetCount += len(aTweets)
+            iTweetCount += len(aSearchResults)
 
+        storeTweets(aTweets)
     
     #Lets see what we got
     print "Total number of tweets " + str(iTweetCount)
@@ -68,6 +76,6 @@ while bContinue:
     iCurrentTime = time.time()
     iTimeToSleepFor = iRequestsReset - iCurrentTime + 1
     
-    print str(iCurrentTime) + " - " + str(iRequestsReset) + " = " + str(iTimeToSleepFor)
+    print "Sleeping for " + str(iTimeToSleepFor) + " seconds.."
     time.sleep(iTimeToSleepFor)
 
