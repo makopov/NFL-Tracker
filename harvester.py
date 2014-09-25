@@ -43,11 +43,14 @@ while bContinue:
 
     iTweetCount = 0
     iLoopCount = 0
+    iStartTime = 0
+    iDoneTime = 0
     aTweets = list()
 
     if iRequestsRemaining > 0:
         print "Starting next interval of search requests.."
         print str(iRequestsRemaining) + " search requests are available at this time"
+        iStartTime = time.time()
 
         #TODO: If we can make API calls, we need to re read the terms file
         #make some function call here to read in terms
@@ -67,8 +70,12 @@ while bContinue:
             iTweetCount += len(aSearchResults)
 
         storeTweets(aTweets)
-    
+        iDoneTime = time.time()
+
+    del aTweets
+
     #Lets see what we got
+    print "Interval execution time was " + str((iDoneTime - iStartTime)/60) + " minutes"
     print "Total number of tweets " + str(iTweetCount)
     print "Total number of search API calls " + str(iLoopCount)
     
