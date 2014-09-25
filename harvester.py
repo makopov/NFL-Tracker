@@ -17,18 +17,21 @@ def storeTweets(aTweets):
     
     oTweetFile = open(strFile, "a")
     
-    oTweetFile.write('\n'.join(aTweets))
+    oTweetFile.write('\n'.join(str(tweet) for tweet in aTweets))
 
     oTweetFile.close()
 
     print "Results written to " + strFile
     return bReturn
 
-oTwitterAPI = twitter.Api(consumer_key='q1xeSRo0kXP7aNpRTd89UtKl7',
+def connectToTwitter():
+    return twitter.Api(consumer_key='q1xeSRo0kXP7aNpRTd89UtKl7',
 	consumer_secret='LgqubqReINYxTjWnYGrATqkRhbBlzk0FGPMXJ1pFospnslUg03',
 	access_token_key='585462531-VsarINfKCH2eJTUGLgp6vCsVGoFzZZGPA9xWXGS3',
 	access_token_secret='Wvj4VXbZIJ3AYC95YepaM9Uxn4ya7n4klBl3X4tSo3d9i',
     use_gzip_compression='true')
+
+oTwitterAPI = connectToTwitter()
 
 bContinue = True
 
@@ -56,11 +59,20 @@ while bContinue:
         
         for iLoop in range(0, iRequestsRemaining):
             #Get Tweets if we have requests available
-            aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
-            
+            try:
+                aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
+            except TwitterError:
+                print "Something went wrong with the connection..."
+                oTwitterAPI = connectToTwitter()
+                break
+            except:
+                print "Something went wrong, we'll re establish a connection and try again"
+                oTwitterAPI = connectToTwitter()
+                break
+
             #check if we've hit our rate limit somehow
             if "message" in aSearchResults == True:
-                #rate limit exceed..somehow, lets sleep
+                #rate limit exceeded..somehow, lets sleep
                 break;
             else:
                 aTweets += aSearchResults
