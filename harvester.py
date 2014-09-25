@@ -17,8 +17,7 @@ def storeTweets(aTweets):
     
     oTweetFile = open(strFile, "a")
     
-    for strTweet in aTweets:
-        oTweetFile.write(str(strTweet))
+    oTweetFile.write('\n'.join(aTweets))
 
     oTweetFile.close()
 
@@ -31,7 +30,7 @@ oTwitterAPI = twitter.Api(consumer_key='q1xeSRo0kXP7aNpRTd89UtKl7',
 	access_token_secret='Wvj4VXbZIJ3AYC95YepaM9Uxn4ya7n4klBl3X4tSo3d9i',
     use_gzip_compression='true')
 
-bContinue = 'true'
+bContinue = True
 
 while bContinue:
     #Check our rate limit
@@ -68,6 +67,11 @@ while bContinue:
 
             iLoopCount +=1
             iTweetCount += len(aSearchResults)
+            del aSearchResults
+        
+        #TODO: threading
+        #import threading
+        #threading.Thread(storeTweets, (aTweets,)).start()
 
         storeTweets(aTweets)
         iDoneTime = time.time()
