@@ -1,6 +1,28 @@
 import twitter
 import json
 import time
+import os
+import sys
+
+def storeTweets(aTweets):
+    bReturn = "true"
+    strTodaysDate = time.strftime("%Y-%m-%d")
+    
+    #does a directory for today date exist yet?
+    #if not create one
+    if (os.path.exists("./" + strTodaysDate)) is False:
+       os.makedirs(strTodaysDate) 
+    
+    strFile = strTodaysDate + "/" + time.strftime("%H") + ".txt"
+    
+    oTweetFile = open(strFile, "a")
+    
+    for strTweet in aTweets:
+        oTweetFile.write(str(strTweet))
+
+    oTweetFile.close()
+
+    return bReturn
 
 oTwitterAPI = twitter.Api(consumer_key='q1xeSRo0kXP7aNpRTd89UtKl7',
 	consumer_secret='LgqubqReINYxTjWnYGrATqkRhbBlzk0FGPMXJ1pFospnslUg03',
@@ -18,26 +40,30 @@ while bContinue:
     iRequestsRemaining = oRateLimit["resources"]["search"]["/search/tweets"]["remaining"]
     iRequestsReset = oRateLimit["resources"]["search"]["/search/tweets"]["reset"]
 
+    iTweetCount = 0
+    iLoopCount = 0
+
+    print "reset= " + str(iRequestsReset) + ", remaining = " + str(iRequestsRemaining) + ", allowed = " + str(iRequestsAllowed)
+
+    sys.exit(0)
     if iRequestsRemaining > 0:
-        #Get Tweets if we have requests available
-        statuses = oTwitterAPI.GetSearch(term='#broncos', count=500, include_entities='true')
-        iCount = 0
+        #TODO: If we can make API calls, we need to re read the terms file
+        #make some function call here to read in terms
 
-        for s in statuses:
-            iCount += 1
-            #print '%s\n' % s.text
+        for iLoop in range(0, iRequestsRemaining):
+            #Get Tweets if we have requests available
+            aTweets = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities='true')
+            
+            storeTweets(aTweets)
 
-        print "#broncos count = " + str(iCount)
+            iLoopCount +=1
+            iTweetCount += len(aTweets)
 
-        iCount = 0
-        statuses = oTwitterAPI.GetSearch(term='#nfl', count=500, include_entities='true')
-
-        for s in statuses:
-            iCount += 1 
-            #print '%s\n' % s.text
-
-        print "#patriots count = " + str(iCount)
-
+    
+    #Lets see what we got
+    print "Total number of tweets " + str(iTweetCount)
+    print "Total number of search API calls " + str(iLoopCount)
+    
     #Sleep untill next reset
     iCurrentTime = time.time()
     iTimeToSleepFor = iRequestsReset - iCurrentTime + 1
