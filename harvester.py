@@ -61,7 +61,7 @@ while bContinue:
             #Get Tweets if we have requests available
             try:
                 aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
-            except TwitterError:
+            except twitter.TwitterError:
                 print "Something went wrong with the connection..."
                 oTwitterAPI = connectToTwitter()
                 break
