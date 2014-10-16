@@ -22,7 +22,7 @@ except ImportError:
 class TweetHarvester:
     #Default constructor for setting up the object
     def __init__(self):
-        readCommandLineArgs()
+        self.readCommandLineArgs()
         
     def storeTweets(aTweets):
         bReturn = "true"
@@ -45,19 +45,19 @@ class TweetHarvester:
         print "Results written to " + strFile
         return bReturn
 
-    def connectToTwitter():
+    def connectToTwitter(self):
         return twitter.Api(consumer_key='rmkM62qY5Soqzp3hy40EnzZYS',
     	consumer_secret='PfSsjuSurlSImFD5vTooiFGQlu0b6wkTj7WdiqupgRWlz3ydyK',
     	access_token_key='585462531-2xVMADCejpNg2Z3TyqkLntYP1WkONDfa4CAhOe6X',
     	access_token_secret='6sxch1mBdSw0cTB7lp40gBZgob5A7vjqGG2DxpZLmiJs2',
         use_gzip_compression='true')
 
-    def archiveFiles(strFileName=''):
+    def archiveFiles(self, strFileName=''):
         #If no filename is passed in, lets set one
         if (strFileName == ''):
             #Lets determine the name of the last directory we created
             oYesterday = datetime.date.today () - datetime.timedelta (days=1) 
-            strFileToArchive = oYesterday.strftime("%Y-%m-%d")
+            strFileToArchive = str(oYesterday.strftime("%Y-%m-%d"))
 
             strFileName = strFileToArchive
 
@@ -65,26 +65,36 @@ class TweetHarvester:
         strZipCommand = "zip -r " + strZipFileName + " " + strFileName
         iZipCommandStatus, strZipCommandOutput = commands.getstatusoutput(strZipCommand)
 
-        #Run the zip command
-        if (iZipCommandStatus != 0):
-            print "Something went wrong while compressing the " + strFileName + " directory"
-            print "\tThe following command was issued: `" + strZipCommand + "`"
-            print "\tThe following output was recieved: '" + strZipCommandOutput + "'"
-        else:
-            #If that succeeds lets remove the uncompressed version
-            print "Successfully archived '" + strFileName + "' to '" + strZipFileName + "'"
+        #Check if the file exists firest
+        strFileExistsCommand = "ls " + strFileName
+        iFileExistsCommandStatus, strExistsCommandOutput = commands.getstatusoutput(strFileExistsCommand) 
 
-            strDeleteOldFileCommand = "rm -rf " + strFileName
-            iRmCommandStatus, strRmCommandOutput = commands.getstatusoutput(strDeleteOldFileCommand)
-
-            if (iRmCommandStatus != 0):
-                print "Something went wrong while deleting the " + strFileName + " directory"
-                print "\tThe following command was issued: `" + strDeleteOldFileCommand + "`"
-                print "\tThe following output was recieved: '" + strRmCommandOutput + "'"
+        #If the file exists, lets continue, otherwise, lets exit
+        if (iFileExistsCommandStatus == 0):
+            #Run the zip command
+            if (iZipCommandStatus != 0):
+                print "Something went wrong while compressing the " + strFileName + " directory"
+                print "\tThe following command was issued: `" + strZipCommand + "`"
+                print "\tThe following output was recieved: '" + strZipCommandOutput + "'"
             else:
-                print "Successfully deleted uncompressed file '" + strFileName + "'"
-
-        #put a sleep command in here to sleep this thread...once its actually threaded
+                #If that succeeds lets remove the uncompressed version
+                print "Successfully archived '" + strFileName + "' to '" + strZipFileName + "'"
+            
+                strDeleteOldFileCommand = "rm -rf " + strFileName
+                iRmCommandStatus, strRmCommandOutput = commands.getstatusoutput(strDeleteOldFileCommand)
+            
+                if (iRmCommandStatus != 0):
+                    print "Something went wrong while deleting the " + strFileName + " directory"
+                    print "\tThe following command was issued: `" + strDeleteOldFileCommand + "`"
+                    print "\tThe following output was recieved: '" + strRmCommandOutput + "'"
+                else:
+                    print "Successfully deleted uncompressed file '" + strFileName + "'"
+        else:
+            print "The file '" + strFileName + "' doesnt exist, nothing to compress"
+        
+        #Put a sleep command in here to sleep this thread for 24 hours
+        #print "Archiver sleeping for 24 hours"
+        #time.sleep(86400)
 
     def loadConfiguration(strConfigurationFile = ''):
         #If no filename is passed in, lets default to defaultConfig.conf
@@ -92,11 +102,11 @@ class TweetHarvester:
             strConfigurationFile = 'defaultConfig.conf'
 
     #Read in command line parameters for things like output directory
-    def readCommandLineArgs():
+    def readCommandLineArgs(self):
         foo = "bar"
 
-    def run():
-        oTwitterAPI = connectToTwitter()
+    def run(self):
+        oTwitterAPI = self.connectToTwitter()
         
         #bContinue = True
         #
@@ -164,6 +174,9 @@ class TweetHarvester:
         #    iCurrentTime = time.time()
         #    iTimeToSleepFor = iRequestsReset - iCurrentTime + 1
         #
+        #    #Lets see if theres anything to archive
+        #    self.archiveFiles()
+        
         #    print "Sleeping for " + str(iTimeToSleepFor) + " seconds.."
         #    time.sleep(iTimeToSleepFor)
 
