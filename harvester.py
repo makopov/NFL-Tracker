@@ -25,6 +25,7 @@ class TweetHarvester:
     strAccessTokenKey = ""
     strAccessTokenSecret = ""
     bUseGzip = True
+    bPaused = False
 
     #Default constructor for setting up the object
     def __init__(self):
@@ -129,79 +130,80 @@ class TweetHarvester:
         foo = "bar"
 
     def run(self):
+        while not self.bPaused:
+            self.query()
+
+    def query(self):
         oTwitterAPI = self.connectToTwitter()
 
-        #bContinue = True
-        #
-        #while bContinue:
-        #    #Check our rate limit
-        #    oRateLimit = oTwitterAPI.GetRateLimitStatus()
-        #
-        #    iRequestsAllowed =  oRateLimit["resources"]["search"]["/search/tweets"]["limit"]
-        #    iRequestsRemaining = oRateLimit["resources"]["search"]["/search/tweets"]["remaining"]
-        #    iRequestsReset = oRateLimit["resources"]["search"]["/search/tweets"]["reset"]
-        #
-        #    iTweetCount = 0
-        #    iLoopCount = 0
-        #    iStartTime = 0
-        #    iDoneTime = 0
-        #    aTweets = list()
-        #
-        #    if iRequestsRemaining > 0:
-        #        print "Starting next interval of search requests.."
-        #        print str(iRequestsRemaining) + " search requests are available at this time"
-        #        iStartTime = time.time()
-        #
-        #        #TODO: If we can make API calls, we need to re read the terms file
-        #        #make some function call here to read in terms
-        #
-        #        for iLoop in range(0, iRequestsRemaining):
-        #            #Get Tweets if we have requests available
-        #            try:
-        #                aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
-        #            except twitter.TwitterError:
-        #                print "Something went wrong with the connection..."
-        #                oTwitterAPI = connectToTwitter()
-        #                break
-        #            except:
-        #                print "Something went wrong, we'll re establish a connection and try again"
-        #                oTwitterAPI = connectToTwitter()
-        #                break
-        #
-        #            #check if we've hit our rate limit somehow
-        #            if "message" in aSearchResults == True:
-        #                #rate limit exceeded..somehow, lets sleep
-        #                break;
-        #            else:
-        #                aTweets += aSearchResults
-        #
-        #            iLoopCount +=1
-        #            iTweetCount += len(aSearchResults)
-        #            del aSearchResults
-        #
-        #        #TODO: threading
-        #        #import threading
-        #        #threading.Thread(storeTweets, (aTweets,)).start()
-        #
-        #        storeTweets(aTweets)
-        #        iDoneTime = time.time()
-        #
-        #    del aTweets
-        #
-        #    #Lets see what we got
-        #    print "Interval execution time was " + str((iDoneTime - iStartTime)/60) + " minutes"
-        #    print "Total number of tweets " + str(iTweetCount)
-        #    print "Total number of search API calls " + str(iLoopCount)
-        #
-        #    #Sleep untill next reset
-        #    iCurrentTime = time.time()
-        #    iTimeToSleepFor = iRequestsReset - iCurrentTime + 1
-        #
-        #    #Lets see if theres anything to archive
-        #    self.archiveFiles()
+        #Check our rate limit
+        oRateLimit = oTwitterAPI.GetRateLimitStatus()
 
-        #    print "Sleeping for " + str(iTimeToSleepFor) + " seconds.."
-        #    time.sleep(iTimeToSleepFor)
+        iRequestsAllowed =  oRateLimit["resources"]["search"]["/search/tweets"]["limit"]
+        iRequestsRemaining = oRateLimit["resources"]["search"]["/search/tweets"]["remaining"]
+        iRequestsReset = oRateLimit["resources"]["search"]["/search/tweets"]["reset"]
+
+        iTweetCount = 0
+        iLoopCount = 0
+        iStartTime = 0
+        iDoneTime = 0
+        aTweets = list()
+
+        if iRequestsRemaining > 0:
+            print "Starting next interval of search requests.."
+            print str(iRequestsRemaining) + " search requests are available at this time"
+            iStartTime = time.time()
+
+            #TODO: If we can make API calls, we need to re read the terms file
+            #make some function call here to read in terms
+
+            for iLoop in range(0, iRequestsRemaining):
+                #Get Tweets if we have requests available
+                try:
+                    aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
+                except twitter.TwitterError:
+                    print "Something went wrong with the connection..."
+                    oTwitterAPI = connectToTwitter()
+                    break
+                except:
+                    print "Something went wrong, we'll re establish a connection and try again"
+                    oTwitterAPI = connectToTwitter()
+                    break
+
+                #check if we've hit our rate limit somehow
+                if "message" in aSearchResults == True:
+                    #rate limit exceeded..somehow, lets sleep
+                    break;
+                else:
+                    aTweets += aSearchResults
+
+                iLoopCount +=1
+                iTweetCount += len(aSearchResults)
+                del aSearchResults
+
+            #TODO: threading
+            #import threading
+            #threading.Thread(storeTweets, (aTweets,)).start()
+
+            storeTweets(aTweets)
+            iDoneTime = time.time()
+
+        del aTweets
+
+        #Lets see what we got
+        print "Interval execution time was " + str((iDoneTime - iStartTime)/60) + " minutes"
+        print "Total number of tweets " + str(iTweetCount)
+        print "Total number of search API calls " + str(iLoopCount)
+
+        #Sleep untill next reset
+        iCurrentTime = time.time()
+        iTimeToSleepFor = iRequestsReset - iCurrentTime + 1
+
+        #Lets see if theres anything to archive
+        self.archiveFiles()
+
+        print "Sleeping for " + str(iTimeToSleepFor) + " seconds.."
+        time.sleep(iTimeToSleepFor)
 
 oHarvester = TweetHarvester()
 oHarvester.run()
