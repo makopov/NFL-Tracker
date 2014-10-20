@@ -20,9 +20,15 @@ except ImportError:
     time.sleep(3)
 
 class TweetHarvester:
+    strConsumerKey = ""
+    strConsumerSecret = ""
+    strAccessTokenKey = ""
+    strAccessTokenSecret = ""
+    
     #Default constructor for setting up the object
     def __init__(self):
         self.readCommandLineArgs()
+        self.loadConfiguration()
         
     def storeTweets(aTweets):
         bReturn = "true"
@@ -96,10 +102,25 @@ class TweetHarvester:
         #print "Archiver sleeping for 24 hours"
         #time.sleep(86400)
 
-    def loadConfiguration(strConfigurationFile = ''):
+    def loadConfiguration(strConfigurationFile = ""):
         #If no filename is passed in, lets default to defaultConfig.conf
-        if (strConfigurationFile == ''):
+        if not strConfigurationFile == "":
             strConfigurationFile = 'defaultConfig.conf'
+
+        oConfigFile = open(strConfigurationFile)
+        oConfigData = json.load(oConfigFile)
+
+        for key, value in oConfigData.items():
+            switch(key) {
+                case "consumer_secret":
+                    print value
+                    #if value == ""
+                    break;
+                default:
+                    break;
+            }
+
+        oConfigFile.close()
 
     #Read in command line parameters for things like output directory
     def readCommandLineArgs(self):
