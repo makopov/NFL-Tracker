@@ -6,6 +6,8 @@ Someday the goal is to store these tweets in a data store such as Cassandra, and
 
 I wrote the script to harvest the tweets in Python, this was my third python script I have ever written, so its practice.
 
+This repo will slowly be updated as I have time to work on it.
+
 Suggestions, improvements, comments welcome.
 
 ### Files ###
