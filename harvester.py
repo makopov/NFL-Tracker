@@ -35,7 +35,7 @@ class TweetHarvester:
     def str2bool(self, bValue):
       return bValue.lower() in ("yes", "true", "t", "1")
 
-    def storeTweets(aTweets):
+    def storeTweets(self, aTweets):
         bReturn = "true"
         oToday = datetime.date.today ()
         strTodaysDate = oToday.strftime("%Y-%m-%d")
@@ -185,7 +185,7 @@ class TweetHarvester:
             #import threading
             #threading.Thread(storeTweets, (aTweets,)).start()
 
-            storeTweets(aTweets)
+            self.storeTweets(aTweets)
             iDoneTime = time.time()
 
         del aTweets
