@@ -9,13 +9,14 @@ while true
 do
 	#Check if script is running
 	processCount=`ps -x | grep $script | wc -l`
+	echo $processCount
 	if [ ${processCount} -gt 1 ]; then
 		echo "$script is running"
 	else
 		#email me
 		echo "$script script not runing"
 		echo -e "$script stopped execution, attempting a restart" | mail -s "$script is not running" $email_address 
-
+		#`python $script &`
 	fi
 
 	#check disk usage
