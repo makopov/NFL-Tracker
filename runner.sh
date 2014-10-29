@@ -2,6 +2,7 @@
 
 device='/dev/vda1'
 script='harvester.py'
+email_address='makopov@gmail.com'
 
 #Run forever
 while true
@@ -13,15 +14,16 @@ do
 	else
 		#email me
 		echo "$script script not runing"
-		mail -s "$script stopped execution, attempting a restart" makopov@gmail.com
+		echo -e "$script stopped execution, attempting a restart" | mail -s "$script is not running" $email_address 
+
 	fi
 
 	#check disk usage
 	let p=`df -k $device | grep -v ^File | awk '{printf ("%i",$3*100 / $2); }'`
 	
-	if [ $p -ge 90 ]
+	if [ $p -ge 70 ]
 	then
-		df -h $device | mail -s "Low on space" makopov@gmail.com
+		df -h $device | mail -s "Harvester is low on space" $email_address
 	fi
 	
 	sleep 5
