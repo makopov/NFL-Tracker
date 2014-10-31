@@ -16,7 +16,8 @@ do
 		#email me
 		echo "$script script not runing"
 		echo -e "$script stopped execution, attempting a restart" | mail -s "$script is not running" $email_address 
-		#`python $script &`
+		`python $script &`
+		echo "woooo!"
 	fi
 
 	#check disk usage
