@@ -4,11 +4,8 @@ device='/dev/vda1'
 script='harvester.py'
 email_address='makopov@gmail.com'
 
-<<<<<<< HEAD
-=======
 bPreviouslyRan=false
 
->>>>>>> master2
 #Run forever
 while true
 do
