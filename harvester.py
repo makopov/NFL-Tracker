@@ -163,11 +163,11 @@ class TweetHarvester:
                     aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
                 except twitter.TwitterError:
                     print "Something went wrong with the connection..."
-                    oTwitterAPI = connectToTwitter()
+                    oTwitterAPI = self.connectToTwitter()
                     break
                 except:
                     print "Something went wrong, we'll re establish a connection and try again"
-                    oTwitterAPI = connectToTwitter()
+                    oTwitterAPI = self.connectToTwitter()
                     break
 
                 #check if we've hit our rate limit somehow
