@@ -167,7 +167,7 @@ class TweetHarvester:
                     break
                 except:
                     print "Something went wrong, we'll re establish a connection and try again"
-                    oTwitterAPI = connectToTwitter()
+                    oTwitterAPI = self.connectToTwitter()
                     break
 
                 #check if we've hit our rate limit somehow
