@@ -4,21 +4,25 @@ device='/dev/vda1'
 script='harvester.py'
 email_address='makopov@gmail.com'
 
+<<<<<<< HEAD
+=======
+bPreviouslyRan=false
+
+>>>>>>> master2
 #Run forever
 while true
 do
 	#Check if script is running
 	processCount=`ps -x | grep $script | wc -l`
-	echo $processCount
+	
 	if [ ${processCount} -gt 1 ]; then
-		echo "$script is running"
+		#echo "$script is running"
+		bPreviouslyRan=true
 	else
 		#email me
-		echo "$script script not runing"
+		#echo "$script script not runing"
 		echo -e "$script stopped execution, attempting a restart" | mail -s "$script is not running" $email_address 
-		#TODO:
-		#For some reason the script waits on this call
-		#`python $script &`
+		python $script &
 	fi
 
 	#check disk usage
