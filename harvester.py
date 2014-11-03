@@ -35,7 +35,7 @@ class TweetHarvester:
     def str2bool(self, bValue):
       return bValue.lower() in ("yes", "true", "t", "1")
 
-    def storeTweets(aTweets):
+    def storeTweets(self, aTweets):
         bReturn = "true"
         oToday = datetime.date.today ()
         strTodaysDate = oToday.strftime("%Y-%m-%d")
@@ -163,11 +163,11 @@ class TweetHarvester:
                     aSearchResults = oTwitterAPI.GetSearch(term='broncos OR seahawks OR patriots OR nfl', count=500, include_entities=True)
                 except twitter.TwitterError:
                     print "Something went wrong with the connection..."
-                    oTwitterAPI = connectToTwitter()
+                    oTwitterAPI = self.connectToTwitter()
                     break
                 except:
                     print "Something went wrong, we'll re establish a connection and try again"
-                    oTwitterAPI = connectToTwitter()
+                    oTwitterAPI = self.connectToTwitter()
                     break
 
                 #check if we've hit our rate limit somehow
@@ -185,7 +185,7 @@ class TweetHarvester:
             #import threading
             #threading.Thread(storeTweets, (aTweets,)).start()
 
-            storeTweets(aTweets)
+            self.storeTweets(aTweets)
             iDoneTime = time.time()
 
         del aTweets
