@@ -70,7 +70,7 @@ class TweetHarvester(StreamListener):
 
         oTweetFile = open(strFile, "a")
 
-        oTweetFile.write('\n' + strError)
+        oTweetFile.write('\n' + str(strError))
 
         oTweetFile.close()
 
