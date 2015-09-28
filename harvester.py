@@ -7,7 +7,6 @@ import datetime
 import tweepy
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
-from tweepy import Stream
 
 # This is if we're running on none debian systems
 try:
@@ -102,8 +101,8 @@ class TweetHarvester(StreamListener):
     def connectToTwitter(self):
         self.oAuth = OAuthHandler(self.strConsumerKey, self.strConsumerSecret)
         self.oAuth.set_access_token(self.strAccessTokenKey, self.strAccessTokenSecret)
-        self.oTweepyAPI = tweepy.API(self.oAuth, compression=self.bUseGzip)
-        self.oStream = Stream(self.oAuth, self)
+        #self.oTweepyAPI = tweepy.API(self.oAuth, compression=self.bUseGzip)
+        self.oStream = tweepy.Stream(self.oAuth, self)
 
     def archiveFiles(self, strFileName=''):
         # If no filename is passed in, lets set one
@@ -118,7 +117,7 @@ class TweetHarvester(StreamListener):
         strZipCommand = "zip -r " + strZipFileName + " " + strFileName
         iZipCommandStatus, strZipCommandOutput = commands.getstatusoutput(strZipCommand)
 
-        # Check if the file exists firest
+        # Check if the file exists first
         strFileExistsCommand = "ls " + strFileName
         iFileExistsCommandStatus, strExistsCommandOutput = commands.getstatusoutput(strFileExistsCommand)
 
