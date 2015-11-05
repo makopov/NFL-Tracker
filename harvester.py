@@ -1,10 +1,10 @@
+import tweepy
 import json
 import time
 import os
 import sys
 import commands
 import datetime
-import tweepy
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 
@@ -30,19 +30,13 @@ class TweetHarvester(StreamListener):
     strAccessTokenSecret = ""
     bUseGzip = True
     bPaused = False
-    oAuth = None
-    oStream = None
-    oTweepyAPI = None
+    iHourlyCount = 0
 
-    # Default constructor for setting up the object
     def __init__(self):
-        self.readCommandLineArgs()
         self.loadConfiguration()
-        self.connectToTwitter()
+        self.readCommandLineArgs()
 
     def on_data(self, strData):
-        bReturn = True
-
         # TODO: threading
         # import threading
         # threading.Thread(self.storeTweets, (strData,)).start()
@@ -52,18 +46,17 @@ class TweetHarvester(StreamListener):
         self.archiveFiles()
 
         # TODO: At the top of every hour report how many tweets have been harvested
-        return bReturn
+        return True
 
     def on_error(self, strError):
         # Log this to the error file
-        bReturn = "true"
-        oToday = datetime.date.today ()
+        oToday = datetime.date.today()
         strTodaysDate = oToday.strftime("%Y-%m-%d")
 
         # does a directory for today date exist yet?
         # if not create one
         if (os.path.exists("./" + strTodaysDate)) is False:
-           os.makedirs(strTodaysDate)
+            os.makedirs(strTodaysDate)
 
         strFile = strTodaysDate + "/" + time.strftime("%H") + ".error"
 
@@ -73,14 +66,13 @@ class TweetHarvester(StreamListener):
 
         oTweetFile.close()
 
-        return bReturn
-
-    def str2bool(self, bValue):
-        return bValue.lower() in ("yes", "true", "t", "1")
+    # Read in command line parameters for things like output directory
+    def readCommandLineArgs(self):
+        foo = "bar"
 
     def storeTweets(self, strTweets):
         bReturn = "true"
-        oToday = datetime.date.today ()
+        oToday = datetime.date.today()
         strTodaysDate = oToday.strftime("%Y-%m-%d")
 
         # does a directory for today date exist yet?
@@ -96,19 +88,11 @@ class TweetHarvester(StreamListener):
 
         oTweetFile.close()
 
-        return bReturn
-
-    def connectToTwitter(self):
-        self.oAuth = OAuthHandler(self.strConsumerKey, self.strConsumerSecret)
-        self.oAuth.set_access_token(self.strAccessTokenKey, self.strAccessTokenSecret)
-        #self.oTweepyAPI = tweepy.API(self.oAuth, compression=self.bUseGzip)
-        self.oStream = tweepy.Stream(self.oAuth, self)
-
     def archiveFiles(self, strFileName=''):
         # If no filename is passed in, lets set one
         if strFileName == '':
             # Lets determine the name of the last directory we created
-            oYesterday = datetime.date.today () - datetime.timedelta (days=1)
+            oYesterday = datetime.date.today() - datetime.timedelta(days=1)
             strFileToArchive = str(oYesterday.strftime("%Y-%m-%d"))
 
             strFileName = strFileToArchive
@@ -142,11 +126,14 @@ class TweetHarvester(StreamListener):
                 else:
                     print "Successfully deleted uncompressed file '" + strFileName + "'"
 
-        # Put a sleep command in here to sleep this thread for 24 hours
-        # print "Archiver sleeping for 24 hours"
-        # time.sleep(86400)
+                    # Put a sleep command in here to sleep this thread for 24 hours
+                    # print "Archiver sleeping for 24 hours"
+                    # time.sleep(86400)
 
-    def loadConfiguration(self, strConfigurationFile = ""):
+    def str2bool(self, bValue):
+        return bValue.lower() in ("yes", "true", "t", "1")
+
+    def loadConfiguration(self, strConfigurationFile=""):
         # If no filename is passed in, lets default to defaultConfig.conf
         if strConfigurationFile == "":
             strConfigurationFile = 'defaultConfig.conf'
@@ -162,17 +149,26 @@ class TweetHarvester(StreamListener):
 
         oConfigFile.close()
 
-    # Read in command line parameters for things like output directory
-    def readCommandLineArgs(self):
-        foo = "bar"
+    def getConsumerKey(self):
+        return self.strConsumerKey
 
-    def run(self):
-        while not self.bPaused:
-            self.query()
+    def getConsumerSecret(self):
+        return self.strConsumerSecret
 
-    def query(self):
-        self.oStream.filter(track=['nfl', 'broncos', 'patriots', 'seahawks'], async=True)
+    def getAccessTokenKey(self):
+        return self.strAccessTokenKey
+
+    def getAccessTokenSecret(self):
+        return self.strAccessTokenSecret
+
+    def getGZip(self):
+        return self.bUseGzip
 
 
 oHarvester = TweetHarvester()
-oHarvester.run()
+
+oAuth = tweepy.OAuthHandler(oHarvester.getConsumerKey(), oHarvester.getConsumerSecret())
+oAuth.set_access_token(oHarvester.getAccessTokenKey(), oHarvester.getAccessTokenSecret())
+oApi = tweepy.API(oAuth, compression=oHarvester.getGZip())
+oStream = tweepy.Stream(oAuth, oHarvester)
+oStream.filter(track=['nfl', 'broncos', 'patriots', 'seahawks'], async=True)
