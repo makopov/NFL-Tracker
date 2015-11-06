@@ -30,7 +30,7 @@ class TweetHarvester(StreamListener):
     strAccessTokenSecret = ""
     bUseGzip = True
     bPaused = False
-    iHourlyCount = 0
+    iIncrementalCount = 0
 
     def __init__(self):
         self.loadConfiguration()
@@ -46,6 +46,9 @@ class TweetHarvester(StreamListener):
         self.archiveFiles()
 
         # TODO: At the top of every hour report how many tweets have been harvested
+        self.iIncrementalCount += 1
+        self.storeCounts()
+
         return True
 
     def on_error(self, strError):
@@ -65,6 +68,29 @@ class TweetHarvester(StreamListener):
         oTweetFile.write('\n' + str(strError))
 
         oTweetFile.close()
+
+        if strError == 420:
+            return False
+
+    def storeCounts(self):
+        # TODO: Create count file, this is dirty implementation
+        if os.path.exists('count') == False:
+            countFile = open('count', 'w')
+            iCurrentCount = 0
+        else:
+            countFile = open('count', 'r+')
+            iCurrentCount = countFile.read()
+
+
+
+
+        iNewCount = int(iCurrentCount) + self.iIncrementalCount
+        countFile.seek(0)
+        countFile.write(str(iNewCount))
+        countFile.truncate()
+        countFile.close()
+
+        self.iIncrementalCount = 0
 
     # Read in command line parameters for things like output directory
     def readCommandLineArgs(self):
