@@ -197,4 +197,38 @@ oAuth = tweepy.OAuthHandler(oHarvester.getConsumerKey(), oHarvester.getConsumerS
 oAuth.set_access_token(oHarvester.getAccessTokenKey(), oHarvester.getAccessTokenSecret())
 oApi = tweepy.API(oAuth, compression=oHarvester.getGZip())
 oStream = tweepy.Stream(oAuth, oHarvester)
-oStream.filter(track=['nfl', 'broncos', 'patriots', 'seahawks'], async=True)
+oStream.filter(track=[
+    'nfl', 
+    'broncos', 
+    'patriots', 
+    'seahawks', 
+    'ravens', 
+    'bengals', 
+    'browns', 
+    'steelers', 
+    'bears', 
+    'lions', 
+    'packers', 
+    'vikings', 
+    'texans', 
+    'colts', 
+    'jaguars', 
+    'titans', 
+    'falcons', 
+    'panthers', 
+    'saints', 
+    'buccaneers', 
+    'bills', 
+    'dolphins', 
+    'jets', 
+    'cowboys', 
+    'giants', 
+    'eagles', 
+    'redskins', 
+    'chiefs', 
+    'raiders', 
+    'chargers', 
+    'cardinals', 
+    '49ers', 
+    'rams'
+    ], async=True)
