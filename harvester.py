@@ -110,7 +110,8 @@ class TweetHarvester(StreamListener):
 
         oTweetFile = open(strFile, "a")
 
-        oTweetFile.write(strTweets)
+	# We're converting strTweets to a string to avoid exceptions, but but we should make sure whats passed in is an actual string	
+        oTweetFile.write(str(strTweets))
 
         oTweetFile.close()
 
