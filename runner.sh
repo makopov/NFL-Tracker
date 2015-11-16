@@ -17,7 +17,7 @@ do
 		bPreviouslyRan=true
 	else
 		#email me
-		#echo "$script script not runing"
+		#echo "$script script not running"
 		echo -e "$script stopped execution, attempting a restart" | mail -s "$script is not running" $email_address 
 		python $script &
 	fi
