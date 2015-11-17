@@ -55,20 +55,13 @@ class TweetHarvester(StreamListener):
         # Log this to the error file
         oToday = datetime.date.today()
         strTodaysDate = oToday.strftime("%Y-%m-%d")
+        strFile = strTodaysDate + ".error"
 
-        # does a directory for today date exist yet?
-        # if not create one
-        if (os.path.exists("./" + strTodaysDate)) is False:
-            os.makedirs(strTodaysDate)
+        oErrorFile = open(strFile, "a")
+        oErrorFile.write(time.strftime("%H:%M:%S") + ": " + str(strError) + "\n")
+        oErrorFile.close()
 
-        strFile = strTodaysDate + "/" + time.strftime("%H") + ".error"
-
-        oTweetFile = open(strFile, "a")
-
-        oTweetFile.write('\n' + str(strError))
-
-        oTweetFile.close()
-
+        # Too many connections to the streaming API, returning false disconnects the stream
         if strError == 420:
             return False
 
@@ -80,9 +73,6 @@ class TweetHarvester(StreamListener):
         else:
             countFile = open('count', 'r+')
             iCurrentCount = countFile.read()
-
-
-
 
         iNewCount = int(iCurrentCount) + self.iIncrementalCount
         countFile.seek(0)
