@@ -1,4 +1,5 @@
 # NFL Tracker #
+<a href="https://codeclimate.com/github/makopov/NFL-Tracker"><img src="https://codeclimate.com/github/makopov/NFL-Tracker/badges/gpa.svg" /></a>
 
 This NFL Tracker app is a side project I picked up a little while ago in an attempt to start self educating in Big Data. Currently the python script just calls twitters API, grabs a bunch of tweets based on a search criteria, then stores those tweets in a file. 
 
